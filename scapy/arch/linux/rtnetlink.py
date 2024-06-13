@@ -703,10 +703,10 @@ NETLINK_GET_STRICT_CHK = 12
 
 
 def _sr1_rtrequest(pkt: Packet) -> List[Packet]:
+    """
+    Send / Receive a rtnetlink request
+    """
     try:
-        """
-        Send / Receive a rtnetlink request
-        """
         # Create socket
         sock = socket.socket(
             socket.AF_NETLINK,
