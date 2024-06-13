@@ -703,25 +703,26 @@ NETLINK_GET_STRICT_CHK = 12
 
 
 def _sr1_rtrequest(pkt: Packet) -> List[Packet]:
-    """
-    Send / Receive a rtnetlink request
-    """
-    # Create socket
-    sock = socket.socket(
-        socket.AF_NETLINK,
-        socket.SOCK_RAW | socket.SOCK_CLOEXEC,
-        socket.NETLINK_ROUTE,
-    )
-    # Configure socket
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 32768)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1048576)
-    sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, 1)
-    sock.bind((0, 0))  # bind to kernel
-    sock.setsockopt(SOL_NETLINK, NETLINK_GET_STRICT_CHK, 1)
-    # Request routes
-    sock.send(bytes(rtmsghdrs(msgs=[pkt])))
-    results: List[Packet] = []
     try:
+        """
+        Send / Receive a rtnetlink request
+        """
+        # Create socket
+        sock = socket.socket(
+            socket.AF_NETLINK,
+            socket.SOCK_RAW | socket.SOCK_CLOEXEC,
+            socket.NETLINK_ROUTE,
+        )
+        # Configure socket
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 32768)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1048576)
+        sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, 1)
+        sock.bind((0, 0))  # bind to kernel
+        sock.setsockopt(SOL_NETLINK, NETLINK_GET_STRICT_CHK, 1)
+        # Request routes
+        sock.send(bytes(rtmsghdrs(msgs=[pkt])))
+        results: List[Packet] = []
+    
         while True:
             msgs = rtmsghdrs(sock.recv(65535))
             if not msgs:
@@ -741,6 +742,8 @@ def _sr1_rtrequest(pkt: Packet) -> List[Packet]:
                             return []
                     return results
                 results.append(msg)
+    except OSError:
+        warning("[Errno 92] Protocol not available")
     finally:
         sock.close()
 
