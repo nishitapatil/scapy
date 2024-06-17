@@ -715,9 +715,9 @@ def _sr1_rtrequest(pkt: Packet) -> List[Packet]:
     # Configure socket
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 32768)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1048576)
-    sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, 1)
-    sock.bind((0, 0))  # bind to kernel
     try:
+        sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, 1)
+        sock.bind((0, 0))  # bind to kernel
         sock.setsockopt(SOL_NETLINK, NETLINK_GET_STRICT_CHK, 1)
     except OSError:
         log_loading.warning("Failed to read the routes using RTNETLINK !")
